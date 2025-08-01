@@ -50,7 +50,7 @@ const mergedNetworks = {
     ...mainnetForkConfig,
     hardhat: {
         forking: {
-            url: process.env.MAINNET_RPC_URLk,
+            url: process.env.MAINNET_RPC_URL,
         },
         chainId: 31337,
         gas: 12000000,
