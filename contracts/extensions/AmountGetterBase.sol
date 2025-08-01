@@ -22,7 +22,7 @@ contract AmountGetterBase is IAmountGetter {
         uint256 takingAmount,
         uint256 remainingMakingAmount,
         bytes calldata extraData
-    ) external view returns (uint256) {
+    ) external view virtual returns (uint256) {
         return _getMakingAmount(order, extension, orderHash, taker, takingAmount, remainingMakingAmount, extraData);
     }
 
@@ -37,7 +37,7 @@ contract AmountGetterBase is IAmountGetter {
         uint256 makingAmount,
         uint256 remainingMakingAmount,
         bytes calldata extraData
-    ) external view returns (uint256) {
+    ) external view virtual returns (uint256) {
         return _getTakingAmount(order, extension, orderHash, taker, makingAmount, remainingMakingAmount, extraData);
     }
 
