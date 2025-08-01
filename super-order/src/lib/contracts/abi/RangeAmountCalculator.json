@@ -1,0 +1,276 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "RangeAmountCalculator",
+  "sourceName": "contracts/extensions/RangeAmountCalculator.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "IncorrectRange",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "salt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "maker",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "receiver",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "makerAsset",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "takerAsset",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "makingAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "takingAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "MakerTraits",
+              "name": "makerTraits",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IOrderMixin.Order",
+          "name": "order",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "takingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "remainingMakingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "extraData",
+          "type": "bytes"
+        }
+      ],
+      "name": "getMakingAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "priceStart",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "priceEnd",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "orderMakingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "takingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "remainingMakingAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRangeMakerAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "priceStart",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "priceEnd",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "orderMakingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "makingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "remainingMakingAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRangeTakerAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "salt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "maker",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "receiver",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "makerAsset",
+              "type": "uint256"
+            },
+            {
+              "internalType": "Address",
+              "name": "takerAsset",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "makingAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "takingAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "MakerTraits",
+              "name": "makerTraits",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IOrderMixin.Order",
+          "name": "order",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "makingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "remainingMakingAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "extraData",
+          "type": "bytes"
+        }
+      ],
+      "name": "getTakingAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60808060405234610016576105e7908161001b8239f35b5f80fdfe60806040526004361015610011575f80fd5b5f3560e01c80631d9671c3146100be57806390c666d1146100a2578063acaf5316146100865763d7ff8a8014610045575f80fd5b3461008257602061007a60a061006f61005d3661010f565b935093509794509592508101906101f9565b9190920135916103e7565b604051908152f35b5f80fd5b3461008257602061007a610099366101b9565b939290926103e7565b3461008257602061007a6100b5366101b9565b9392909261020f565b3461008257602061007a60a06100d661005d3661010f565b91909201359161020f565b9181601f840112156100825782359167ffffffffffffffff8311610082576020838186019501011161008257565b907ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc82016101c0811261008257610100136100825760049167ffffffffffffffff90610104358281116100825781610169916004016100e1565b9390939261012435926101443573ffffffffffffffffffffffffffffffffffffffff811681036100825792610164359261018435926101a435918211610082576101b5916004016100e1565b9091565b7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc60a0910112610082576004359060243590604435906064359060843590565b9190826040910312610082576020823592013590565b9091929381831115610359576102259084610383565b926102308284610383565b670de0b6b3a7640000938482029180830486149015171561032c5761026c8461026661025f86610272966103a3565b9582610390565b92610383565b906103a3565b9461027d8684610390565b927f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff93848216820361032c576102ce6102c86102d493886102be8b89610390565b049060011b6103da565b88610390565b906103da565b908060011b9381160361032c578383029280840485149015171561032c57610304926102ff916103da565b6103a3565b81810291818304149015171561032c57610329926103246103249261047a565b610383565b90565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b60046040517f863265dc000000000000000000000000000000000000000000000000000000008152fd5b9190820391821161032c57565b8181029291811591840414171561032c57565b81156103ad570490565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601260045260245ffd5b9190820180921161032c57565b93929190928484111561035957846104026104089284610383565b94610383565b907f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff93848116810361032c5761044e92610448856102ff9360011b6103da565b90610390565b918316830361032c5761047161047692671bc16d674ec800009460011b906103da565b610390565b0490565b6001808211156105ad57610549908083700100000000000000000000000000000000811015610596575b80680100000000000000006004921015610589575b64010000000081101561057c575b6201000081101561056f575b610100811015610563575b6010811015610557575b1015610550575b600302811c6104fe81856103a3565b01811c61050b81856103a3565b01811c61051881856103a3565b01811c61052581856103a3565b01811c61053281856103a3565b01811c61053f81856103a3565b01901c80926103a3565b8111900390565b811b6104ef565b811c9160021b916104e8565b60081c91811b916104de565b60101c9160081b916104d3565b60201c9160101b916104c7565b60401c9160201b916104b9565b50680100000000000000009050608084901c6104a4565b509056fea26469706673582212208e17ec707a00972bde5e8feb5ff9a70758e9794416588042136c8ec3297afd7964736f6c63430008170033",
+  "deployedBytecode": "0x60806040526004361015610011575f80fd5b5f3560e01c80631d9671c3146100be57806390c666d1146100a2578063acaf5316146100865763d7ff8a8014610045575f80fd5b3461008257602061007a60a061006f61005d3661010f565b935093509794509592508101906101f9565b9190920135916103e7565b604051908152f35b5f80fd5b3461008257602061007a610099366101b9565b939290926103e7565b3461008257602061007a6100b5366101b9565b9392909261020f565b3461008257602061007a60a06100d661005d3661010f565b91909201359161020f565b9181601f840112156100825782359167ffffffffffffffff8311610082576020838186019501011161008257565b907ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc82016101c0811261008257610100136100825760049167ffffffffffffffff90610104358281116100825781610169916004016100e1565b9390939261012435926101443573ffffffffffffffffffffffffffffffffffffffff811681036100825792610164359261018435926101a435918211610082576101b5916004016100e1565b9091565b7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc60a0910112610082576004359060243590604435906064359060843590565b9190826040910312610082576020823592013590565b9091929381831115610359576102259084610383565b926102308284610383565b670de0b6b3a7640000938482029180830486149015171561032c5761026c8461026661025f86610272966103a3565b9582610390565b92610383565b906103a3565b9461027d8684610390565b927f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff93848216820361032c576102ce6102c86102d493886102be8b89610390565b049060011b6103da565b88610390565b906103da565b908060011b9381160361032c578383029280840485149015171561032c57610304926102ff916103da565b6103a3565b81810291818304149015171561032c57610329926103246103249261047a565b610383565b90565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b60046040517f863265dc000000000000000000000000000000000000000000000000000000008152fd5b9190820391821161032c57565b8181029291811591840414171561032c57565b81156103ad570490565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601260045260245ffd5b9190820180921161032c57565b93929190928484111561035957846104026104089284610383565b94610383565b907f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff93848116810361032c5761044e92610448856102ff9360011b6103da565b90610390565b918316830361032c5761047161047692671bc16d674ec800009460011b906103da565b610390565b0490565b6001808211156105ad57610549908083700100000000000000000000000000000000811015610596575b80680100000000000000006004921015610589575b64010000000081101561057c575b6201000081101561056f575b610100811015610563575b6010811015610557575b1015610550575b600302811c6104fe81856103a3565b01811c61050b81856103a3565b01811c61051881856103a3565b01811c61052581856103a3565b01811c61053281856103a3565b01811c61053f81856103a3565b01901c80926103a3565b8111900390565b811b6104ef565b811c9160021b916104e8565b60081c91811b916104de565b60101c9160081b916104d3565b60201c9160101b916104c7565b60401c9160201b916104b9565b50680100000000000000009050608084901c6104a4565b509056fea26469706673582212208e17ec707a00972bde5e8feb5ff9a70758e9794416588042136c8ec3297afd7964736f6c63430008170033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

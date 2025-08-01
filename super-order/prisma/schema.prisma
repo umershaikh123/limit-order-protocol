@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  orderHash       String   @unique
+  orderType       String   // "stop-loss", "take-profit", "iceberg", "oco"
+  maker           String
+  makerAsset      String
+  takerAsset      String
+  makingAmount    String
+  takingAmount    String
+  salt            String
+  signature       String
+  status          String   @default("active") // "active", "filled", "cancelled", "expired"
+  
+  // Stop Loss specific fields
+  triggerPrice    String?
+  isStopLoss      Boolean?
+  maxSlippage     String?
+  maxPriceDeviation String?
+  
+  // Transaction details
+  createTxHash    String?
+  fillTxHash      String?
+  filledAmount    String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  executedAt      DateTime?
+  
+  // Relations
+  events      OrderEvent[]
+  
+  @@index([maker])
+  @@index([status])
+  @@index([orderType])
+}
+
+model OrderEvent {
+  id          String   @id @default(cuid())
+  orderId     String
+  eventType   String   // "created", "filled", "cancelled", "updated"
+  txHash      String?
+  blockNumber Int?
+  data        Json?    // Additional event data
+  createdAt   DateTime @default(now())
+  
+  order       Order    @relation(fields: [orderId], references: [id])
+  
+  @@index([orderId])
+  @@index([eventType])
+}

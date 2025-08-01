@@ -1,0 +1,26 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "OrderLib",
+  "sourceName": "contracts/OrderLib.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidExtensionHash",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MissingOrderExtension",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnexpectedOrderExtension",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x6080806040523460175760399081601c823930815050f35b5f80fdfe5f80fdfea264697066735822122077f1b0eaa41ce13099fbc6dfb69f68b7287aecc9d52b1853f23b22c62f392d7864736f6c63430008170033",
+  "deployedBytecode": "0x5f80fdfea264697066735822122077f1b0eaa41ce13099fbc6dfb69f68b7287aecc9d52b1853f23b22c62f392d7864736f6c63430008170033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
