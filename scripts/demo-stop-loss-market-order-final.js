@@ -17,7 +17,7 @@
  * - Configurable slippage and price deviation limits
  * - Emergency controls and pause functionality
  *
- * Usage: npx hardhat run scripts/demo-stop-loss-market-order-final.js --network localhost
+ * Usage: npx hardhat run scripts/demo-stop-loss-market-order-final.js
  */
 
 const { ethers } = require("hardhat");
