@@ -8,6 +8,7 @@ import { OCOOrderInterface } from "@/components/orders/OCOOrderInterface";
 import { Navigation } from "@/components/Navigation";
 import { HeaderBalance } from "@/components/HeaderBalance";
 import { toast } from "sonner";
+import Link from "next/link";
 type OrderType = "stop-loss" | "iceberg" | "oco";
 
 export default function Home() {
@@ -30,6 +31,18 @@ export default function Home() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-4">
+                            <Link
+                                href="/orders"
+                                className="text-sm bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-2 rounded-lg hover:bg-blue-500/30 transition-colors"
+                            >
+                                My Orders
+                            </Link>
+                            <Link
+                                href="/debug"
+                                className="text-sm bg-orange-500/20 text-orange-400 border border-orange-500/30 px-3 py-2 rounded-lg hover:bg-orange-500/30 transition-colors"
+                            >
+                                🐛 Debug
+                            </Link>
                             <HeaderBalance />
                             <ConnectButton />
                         </div>

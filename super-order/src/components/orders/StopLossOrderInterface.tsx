@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useAccount } from "wagmi";
+import { useTokenApproval } from "@/hooks/useTokenApproval";
+import { useStopLossOrder } from "@/hooks/useStopLossOrder";
+import { toast } from "sonner";
 
 export function StopLossOrderInterface() {
     const { address, isConnected } = useAccount();
@@ -16,10 +19,62 @@ export function StopLossOrderInterface() {
         maxPriceDeviation: "5",
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Get the selling token from the pair
+    const sellToken = formData.tokenPair.split("/")[0] as
+        | "WETH"
+        | "DAI"
+        | "USDC";
+
+    // Token approval hook
+    const {
+        isApproved,
+        handleApprove,
+        isLoading: isApprovalLoading,
+        allowance,
+    } = useTokenApproval(sellToken);
+
+    // Stop loss order hook
+    const {
+        createStopLossOrder,
+        isLoading: isOrderLoading,
+    } = useStopLossOrder();
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Creating stop loss order:", formData);
-        // TODO: Integrate with contract
+
+        if (!formData.amount || !formData.triggerPrice) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
+
+        console.log("=== Order Submission Debug ===");
+        console.log("Current Allowance:", allowance, sellToken);
+        console.log("Required Amount:", formData.amount, sellToken);
+
+        // Check if token is approved
+        if (!isApproved(formData.amount)) {
+            await handleApprove(formData.amount);
+            return;
+        }
+
+        // Create the actual order
+        try {
+            console.log("Creating stop loss order with params:", {
+                ...formData,
+                isStopLoss: orderType === "stop-loss"
+            });
+            
+            await createStopLossOrder({
+                tokenPair: formData.tokenPair,
+                amount: formData.amount,
+                triggerPrice: formData.triggerPrice,
+                isStopLoss: orderType === "stop-loss",
+                slippage: formData.slippage,
+                maxPriceDeviation: formData.maxPriceDeviation,
+            });
+        } catch (error) {
+            console.error("Order creation failed:", error);
+        }
     };
 
     if (!isConnected) {
@@ -245,17 +300,75 @@ export function StopLossOrderInterface() {
                         {/* Submit Button */}
                         <button
                             type="submit"
+                            disabled={isApprovalLoading || isOrderLoading}
                             className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
-                                orderType === "stop-loss"
+                                isApprovalLoading || isOrderLoading
+                                    ? "bg-gray-600 cursor-not-allowed"
+                                    : orderType === "stop-loss"
                                     ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
                                     : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
                             }`}
                         >
-                            Create{" "}
-                            {orderType === "stop-loss"
-                                ? "Stop Loss"
-                                : "Take Profit"}{" "}
-                            Order
+                            {isApprovalLoading ? (
+                                <span className="flex items-center justify-center">
+                                    <svg
+                                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Approving...
+                                </span>
+                            ) : isOrderLoading ? (
+                                <span className="flex items-center justify-center">
+                                    <svg
+                                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Creating Order...
+                                </span>
+                            ) : !formData.amount ||
+                              !isApproved(formData.amount) ? (
+                                `Approve ${sellToken}`
+                            ) : (
+                                <>
+                                    Create{" "}
+                                    {orderType === "stop-loss"
+                                        ? "Stop Loss"
+                                        : "Take Profit"}{" "}
+                                    Order
+                                </>
+                            )}
                         </button>
                     </form>
                 </div>

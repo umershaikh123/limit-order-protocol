@@ -21,7 +21,12 @@ model Order {
   takingAmount    String
   salt            String
   signature       String
+  makerTraits     String   @default("0")
   status          String   @default("active") // "active", "filled", "cancelled", "expired"
+  
+  // Extension data for advanced orders
+  makingAmountData String?
+  takingAmountData String?
   
   // Stop Loss specific fields
   triggerPrice    String?
