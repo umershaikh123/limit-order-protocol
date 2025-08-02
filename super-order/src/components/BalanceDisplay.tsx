@@ -28,16 +28,6 @@ export function BalanceDisplay({ className = "", showTitle = true }: BalanceDisp
         },
     });
 
-    // USDC Balance
-    const { data: usdcBalance } = useReadContract({
-        address: TOKENS.USDC.address as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        args: address ? [address] : undefined,
-        query: {
-            enabled: !!address,
-        },
-    });
 
     // DAI Balance
     const { data: daiBalance } = useReadContract({
@@ -68,15 +58,17 @@ export function BalanceDisplay({ className = "", showTitle = true }: BalanceDisp
         const formatted = formatUnits(balance, decimals);
         const num = parseFloat(formatted);
         
+        console.log(`Balance formatting debug: ${formatted} -> ${num}`); // Debug log
+        
         // Format with appropriate decimal places
         if (num >= 1000000) {
             return (num / 1000000).toFixed(2) + "M";
         } else if (num >= 1000) {
-            return (num / 1000).toFixed(2) + "K";
+            return (num / 1000).toFixed(1) + "K";
         } else if (num >= 1) {
-            return num.toFixed(2);
+            return num.toFixed(1);
         } else {
-            return num.toFixed(6);
+            return num.toFixed(4);
         }
     };
 
@@ -114,16 +106,6 @@ export function BalanceDisplay({ className = "", showTitle = true }: BalanceDisp
                     </span>
                 </div>
 
-                {/* USDC Balance */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                        <span className="text-lg">{TOKENS.USDC.icon}</span>
-                        <span className="text-gray-300 text-sm font-medium">{TOKENS.USDC.symbol}</span>
-                    </div>
-                    <span className="text-white text-sm font-mono">
-                        {formatBalance(usdcBalance as bigint, TOKENS.USDC.decimals)}
-                    </span>
-                </div>
 
                 {/* DAI Balance */}
                 <div className="flex items-center justify-between">

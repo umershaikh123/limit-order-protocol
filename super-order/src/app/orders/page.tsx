@@ -8,6 +8,7 @@ import Link from "next/link";
 import { OrderExecutionModal } from "@/components/orders/OrderExecutionModal";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { HeaderBalance } from "@/components/HeaderBalance";
+import { DemoAccountSwitcher } from "@/components/DemoAccountSwitcher";
 
 interface Order {
   id: string;
@@ -187,6 +188,11 @@ export default function OrdersPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-100">Order Management</h1>
           <p className="mt-2 text-gray-400">View and manage your limit orders</p>
+        </div>
+
+        {/* Demo Account Switcher */}
+        <div className="mb-8">
+          <DemoAccountSwitcher />
         </div>
 
         {/* Filters */}

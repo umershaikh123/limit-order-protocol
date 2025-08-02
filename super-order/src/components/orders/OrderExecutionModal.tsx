@@ -30,7 +30,6 @@ interface BalanceData {
 
 const TOKEN_SYMBOLS: { [key: string]: string } = {
   [CONTRACT_ADDRESSES.weth]: "WETH",
-  [CONTRACT_ADDRESSES.usdc]: "USDC", 
   [CONTRACT_ADDRESSES.dai]: "DAI",
 };
 

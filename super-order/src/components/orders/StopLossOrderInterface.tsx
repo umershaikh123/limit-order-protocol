@@ -12,7 +12,7 @@ export function StopLossOrderInterface() {
         "stop-loss"
     );
     const [formData, setFormData] = useState({
-        tokenPair: "WETH/USDC",
+        tokenPair: "WETH/DAI",
         amount: "",
         triggerPrice: "",
         slippage: "1",
@@ -168,20 +168,30 @@ export function StopLossOrderInterface() {
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Token Pair
                             </label>
-                            <select
-                                value={formData.tokenPair}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        tokenPair: e.target.value,
-                                    })
-                                }
-                                className="w-full bg-gray-800/90 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-                            >
-                                <option value="WETH/USDC">WETH/USDC</option>
-                                <option value="WETH/DAI">WETH/DAI</option>
-                                <option value="WBTC/USDC">WBTC/USDC</option>
-                            </select>
+                            <div className="relative">
+                                <select
+                                    value={formData.tokenPair}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            tokenPair: e.target.value,
+                                        })
+                                    }
+                                    className="w-full bg-gray-800/90 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                >
+                                    <option value="WETH/DAI">WETH/DAI</option>
+                                    <option value="DAI/WETH">DAI/WETH</option>
+                                </select>
+                                <div className="absolute right-3 top-2">
+                                    <div className="flex items-center space-x-1">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                        <span className="text-xs text-gray-400">Live</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">
+                                Using Chainlink oracle feeds for reliable price data
+                            </p>
                         </div>
 
                         {/* Amount */}
@@ -204,7 +214,7 @@ export function StopLossOrderInterface() {
                                     className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none pr-16"
                                 />
                                 <span className="absolute right-3 top-2 text-gray-400 text-sm">
-                                    WETH
+                                    {sellToken}
                                 </span>
                             </div>
                         </div>
@@ -231,7 +241,7 @@ export function StopLossOrderInterface() {
                                     className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none pr-16"
                                 />
                                 <span className="absolute right-3 top-2 text-gray-400 text-sm">
-                                    USDC
+                                    {formData.tokenPair.split("/")[1]}
                                 </span>
                             </div>
                             <p className="text-xs text-gray-400 mt-1">
@@ -399,7 +409,7 @@ export function StopLossOrderInterface() {
                             <div className="flex justify-between">
                                 <span className="text-gray-400">Amount:</span>
                                 <span className="text-white">
-                                    {formData.amount || "0.00"} WETH
+                                    {formData.amount || "0.00"} {sellToken}
                                 </span>
                             </div>
                             <div className="flex justify-between">

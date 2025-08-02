@@ -7,6 +7,7 @@ import {
   LIMIT_ORDER_PROTOCOL_ABI, 
   ERC20_ABI 
 } from '@/lib/contracts/config';
+import { DEMO_ACCOUNTS } from './useDemoAccounts';
 
 // Helper function to build taker traits (from orderUtils.js)
 function buildTakerTraits({
@@ -81,6 +82,10 @@ interface OrderData {
 
 export function useOrderExecution() {
   const { address } = useAccount();
+  
+  // For demo purposes, we'll use the funded taker account
+  // In production, this would be the connected wallet address
+  const FUNDED_TAKER_ADDRESS = DEMO_ACCOUNTS.taker.address as Address;
 
   // Contract write hooks for execution
   const { 
@@ -108,17 +113,127 @@ export function useOrderExecution() {
     });
   };
 
-  // Execute an order
+  // Execute an order using MetaMask
   const executeOrderFunction = async (orderData: OrderData, amountToFill?: string) => {
     if (!address) {
-      toast.error("Please connect your wallet");
-      return;
+      toast.error("Please connect your wallet first");
+      throw new Error("Wallet not connected");
     }
 
+    console.log("=== MetaMask Order Execution ===");
+    console.log("Connected Wallet:", address);
+    console.log("Order Data:", orderData);
+    console.log("Amount to Fill:", amountToFill || "Full Amount");
+
     try {
-      console.log("=== Order Execution Debug ===");
+      // Get token decimals
+      const decimals = {
+        [CONTRACT_ADDRESSES.weth]: 18,
+        [CONTRACT_ADDRESSES.usdc]: 6,
+        [CONTRACT_ADDRESSES.dai]: 18,
+      };
+
+      const makerDecimals = decimals[orderData.makerAsset as keyof typeof decimals] || 18;
+
+      // Calculate fill amount (default to full order)
+      const fillAmount = amountToFill 
+        ? parseUnits(amountToFill, makerDecimals)
+        : BigInt(orderData.makingAmount);
+
+      console.log("Fill Amount (wei):", fillAmount.toString());
+
+      // Get balances before execution for display
+      const makerBalanceBefore = await fetch(`/api/balance?token=${orderData.makerAsset}&account=${orderData.maker}`);
+      const takerBalanceBefore = await fetch(`/api/balance?token=${orderData.takerAsset}&account=${address}`);
+
+      console.log("Balances fetched, preparing order execution...");
+
+      // Reconstruct the order object - CRITICAL: Do NOT include extension data for execution
+      // Extension data is only used during creation/signing, not during fillOrderArgs execution
+      const order = {
+        salt: BigInt(orderData.salt),
+        maker: orderData.maker as Address,
+        receiver: orderData.maker as Address,
+        makerAsset: orderData.makerAsset as Address,
+        takerAsset: orderData.takerAsset as Address,
+        makingAmount: BigInt(orderData.makingAmount),
+        takingAmount: BigInt(orderData.takingAmount),
+        makerTraits: BigInt(orderData.makerTraits || "0"),
+        // NOTE: Extension data (makingAmountData, takingAmountData) is NOT included here
+        // This matches the working script execution pattern
+      };
+
+      console.log("Order structure:", order);
+      console.log("Extension data - makingAmountData:", orderData.makingAmountData);
+      console.log("Extension data - takingAmountData:", orderData.takingAmountData);
+
+      // Convert signature to r, vs format
+      const { r, vs } = signatureToRVS(orderData.signature);
+      console.log("Signature split - r:", r, "vs:", vs);
+
+      // Build taker traits - CRITICAL: Must include extension for stop loss orders
+      // The extension tells the protocol to call IAmountGetter during execution
+      const takerTraits = buildTakerTraits({
+        extension: orderData.makingAmountData || '0x', // Include the extension data
+      });
+
+      console.log("Taker Traits:", takerTraits);
+
+      toast.loading("Executing order with MetaMask...", {
+        id: "execute-order",
+      });
+
+      // Execute the order using fillOrderArgs with MetaMask
+      await executeOrder({
+        address: CONTRACT_ADDRESSES.limitOrderProtocol as Address,
+        abi: LIMIT_ORDER_PROTOCOL_ABI,
+        functionName: 'fillOrderArgs',
+        args: [
+          order,
+          r,
+          vs,
+          fillAmount,
+          takerTraits.traits,
+          takerTraits.args,
+        ],
+      });
+
+      console.log("Order execution transaction submitted with MetaMask!");
+
+      // Return success - the useEffect hooks will handle the rest
+      return { success: true, message: "Transaction submitted via MetaMask" };
+
+    } catch (error: any) {
+      console.error("=== MetaMask Execution Error ===");
+      console.error("Error object:", error);
+      console.error("Error message:", error?.message);
+      console.error("Error cause:", error?.cause);
+      console.error("Error details:", error?.details);
+      console.error("Error data:", error?.data);
+      console.error("Error stack:", error?.stack);
+      
+      // Log the order data that failed
+      console.error("Failed order data:", orderData);
+      
+      toast.error(`Failed to execute order: ${error?.message || 'Unknown error'}`, {
+        id: "execute-order",
+      });
+      throw error;
+    }
+  };
+
+  // Legacy execution function (keeping for reference)
+  const executeOrderFunctionLegacy = async (orderData: OrderData, amountToFill?: string) => {
+    // For demo, we'll use the funded taker address regardless of connected wallet
+    const executorAddress = FUNDED_TAKER_ADDRESS;
+    
+    console.log("=== Order Execution Debug ===");
+    console.log("Connected Wallet:", address);
+    console.log("Executor Address (Demo):", executorAddress);
+    console.log("Using funded taker account for demo execution");
+
+    try {
       console.log("Order Data:", orderData);
-      console.log("Executor Address:", address);
       console.log("Amount to Fill:", amountToFill || "Full Amount");
 
       // Get token decimals
@@ -138,9 +253,9 @@ export function useOrderExecution() {
 
       console.log("Fill Amount (wei):", fillAmount.toString());
 
-      // Get balances before execution
+      // Get balances before execution using the funded taker address
       const makerBalanceBefore = await fetch(`/api/balance?token=${orderData.makerAsset}&account=${orderData.maker}`);
-      const takerBalanceBefore = await fetch(`/api/balance?token=${orderData.takerAsset}&account=${address}`);
+      const takerBalanceBefore = await fetch(`/api/balance?token=${orderData.takerAsset}&account=${executorAddress}`);
 
       console.log("Balances fetched, preparing order execution...");
 
@@ -249,13 +364,22 @@ export function useOrderExecution() {
   // Handle successful execution
   useEffect(() => {
     if (isExecuteSuccess && executeHash) {
-      toast.success("Order executed successfully!", {
+      console.log("=== ORDER EXECUTION SUCCESS ===");
+      console.log("✅ Transaction confirmed!");
+      console.log("🔗 Transaction Hash:", executeHash);
+      console.log("🔍 Use this hash in debug page for full details:", executeHash);
+      
+      toast.success(`Order executed! Tx: ${executeHash.slice(0, 10)}...`, {
         id: "execute-order",
+        duration: 6000,
       });
       
-      // Update order status (orderHash would need to be passed here)
-      // For now, we'll handle this in the component
-      console.log("Execution successful! Tx hash:", executeHash);
+      // Show success message with transaction hash
+      setTimeout(() => {
+        toast.success(`🔗 Transaction Hash: ${executeHash}`, {
+          duration: 8000,
+        });
+      }, 1000);
     }
   }, [isExecuteSuccess, executeHash]);
 
