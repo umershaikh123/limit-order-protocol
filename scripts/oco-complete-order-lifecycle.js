@@ -377,13 +377,6 @@ async function main() {
     console.log(`\n🏁 OCO order lifecycle completed successfully!`);
     console.log(`   This demonstrates how traders can set both`);
     console.log(`   upside and downside targets simultaneously.`);
-
-    // Keeper stats
-    console.log(`\n📊 Keeper Performance:`);
-    const keeperStats = await ocoKeeper.getKeeperStats(keeper.address);
-    console.log(`   Total Executions: ${keeperStats.totalExecutions}`);
-    console.log(`   Successful: ${keeperStats.successfulExecutions}`);
-    console.log(`   Average Gas: ${keeperStats.averageGasUsed}`);
 }
 
 // Execute demo
