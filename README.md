@@ -91,7 +91,7 @@ Our implementation leverages the 1inch protocol's extension system through:
 -   Automated order execution
 -   Emergency controls
 
-### Mock Iceberg Keeper ([`contracts/helpers/MockIcebergKeeper.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/MockIcebergKeeper.sol))
+### Mock Iceberg Keeper ([`contracts/mocks/MockIcebergKeeper.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/mocks/MockIcebergKeeper.sol))
 
 -   Chunk revelation automation
 -   Strategy-based timing logic
