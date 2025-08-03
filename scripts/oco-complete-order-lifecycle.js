@@ -1,9 +1,9 @@
 /**
  * OCO (One Cancels Other) Order Complete Lifecycle Demo
- * 
+ *
  * This script demonstrates the complete lifecycle of an OCO order from creation to execution.
  * It showcases the core functionality of linked orders that automatically cancel each other.
- * 
+ *
  * Lifecycle Steps:
  * 1. Contract deployment and setup
  * 2. Create two linked orders (primary and secondary)
@@ -12,70 +12,84 @@
  * 5. Execute one order
  * 6. Automatic cancellation of the paired order
  * 7. Keeper-based cancellation processing
- * 
+ *
  * Usage: npx hardhat run scripts/oco-complete-order-lifecycle.js
  */
 
 const { ethers } = require("hardhat");
 const { ether } = require("../test/helpers/utils");
-const { signOrder, buildOrder, buildTakerTraits } = require("../test/helpers/orderUtils");
+const {
+    signOrder,
+    buildOrder,
+    buildTakerTraits,
+} = require("../test/helpers/orderUtils");
 const { deploySwapTokens } = require("../test/helpers/fixtures");
 
 // Helper function to build extension data for OCO orders
-function buildOCOExtensionData(ocoAddress, extraData = '0x') {
-    return ethers.solidityPacked(
-        ['address', 'bytes'],
-        [ocoAddress, extraData]
-    );
+function buildOCOExtensionData(ocoAddress, extraData = "0x") {
+    return ethers.solidityPacked(["address", "bytes"], [ocoAddress, extraData]);
 }
 
 // Helper function to create OCO ID from order hashes
 function createOCOId(primaryHash, secondaryHash) {
     return ethers.keccak256(
-        ethers.solidityPacked(['bytes32', 'bytes32'], [primaryHash, secondaryHash])
+        ethers.solidityPacked(
+            ["bytes32", "bytes32"],
+            [primaryHash, secondaryHash]
+        )
     );
 }
 
 // Helper to display order status
 async function displayOCOStatus(ocoExtension, ocoId, orderHash1, orderHash2) {
     const config = await ocoExtension.getOCOConfig(ocoId);
-    const [isOCO1, ocoId1, isActive1] = await ocoExtension.getOrderOCOStatus(orderHash1);
-    const [isOCO2, ocoId2, isActive2] = await ocoExtension.getOrderOCOStatus(orderHash2);
-    
+    const [isOCO1, ocoId1, isActive1] = await ocoExtension.getOrderOCOStatus(
+        orderHash1
+    );
+    const [isOCO2, ocoId2, isActive2] = await ocoExtension.getOrderOCOStatus(
+        orderHash2
+    );
+
     console.log(`\n📊 OCO Status:`);
     console.log(`   OCO ID: ${ocoId.slice(0, 10)}...`);
-    console.log(`   Strategy: ${['BRACKET', 'BREAKOUT', 'RANGE'][config.strategy]}`);
-    console.log(`   Active: ${config.isActive ? '✅' : '❌'}`);
+    console.log(
+        `   Strategy: ${["BRACKET", "BREAKOUT", "RANGE"][config.strategy]}`
+    );
+    console.log(`   Active: ${config.isActive ? "✅" : "❌"}`);
     console.log(`   Primary Order:`);
-    console.log(`     - Is OCO: ${isOCO1 ? '✅' : '❌'}`);
-    console.log(`     - Active: ${isActive1 ? '✅' : '❌'}`);
-    console.log(`     - Executed: ${config.isPrimaryExecuted ? '✅' : '❌'}`);
+    console.log(`     - Is OCO: ${isOCO1 ? "✅" : "❌"}`);
+    console.log(`     - Active: ${isActive1 ? "✅" : "❌"}`);
+    console.log(`     - Executed: ${config.isPrimaryExecuted ? "✅" : "❌"}`);
     console.log(`   Secondary Order:`);
-    console.log(`     - Is OCO: ${isOCO2 ? '✅' : '❌'}`);
-    console.log(`     - Active: ${isActive2 ? '✅' : '❌'}`);
-    console.log(`     - Executed: ${config.isSecondaryExecuted ? '✅' : '❌'}`);
+    console.log(`     - Is OCO: ${isOCO2 ? "✅" : "❌"}`);
+    console.log(`     - Active: ${isActive2 ? "✅" : "❌"}`);
+    console.log(`     - Executed: ${config.isSecondaryExecuted ? "✅" : "❌"}`);
 }
 
 // Helper to execute order
 async function executeOrder(swap, order, signature, fillAmount, taker, label) {
     console.log(`\n💱 Executing ${label}...`);
-    
+
     const { r, yParityAndS: vs } = ethers.Signature.from(signature);
     const takerTraits = buildTakerTraits({
-        extension: order.extension
+        extension: order.extension,
     });
 
-    const tx = await swap.connect(taker).fillOrderArgs(
-        order,
-        r,
-        vs,
-        fillAmount,
-        takerTraits.traits,
-        takerTraits.args
-    );
-    
+    const tx = await swap
+        .connect(taker)
+        .fillOrderArgs(
+            order,
+            r,
+            vs,
+            fillAmount,
+            takerTraits.traits,
+            takerTraits.args
+        );
+
     const receipt = await tx.wait();
-    console.log(`   ✅ Order executed | Gas used: ${receipt.gasUsed.toLocaleString()}`);
+    console.log(
+        `   ✅ Order executed | Gas used: ${receipt.gasUsed.toLocaleString()}`
+    );
     return receipt;
 }
 
@@ -83,7 +97,7 @@ async function main() {
     console.log("⚖️ OCO Order Complete Lifecycle Demo");
     console.log("=".repeat(60));
     console.log("Demonstrating BRACKET strategy: Take Profit + Stop Loss");
-    
+
     // Get signers
     const [deployer, trader, taker, keeper] = await ethers.getSigners();
     console.log(`\n👥 Participants:`);
@@ -94,22 +108,22 @@ async function main() {
     // 1. Deploy contracts
     console.log(`\n🏗️  Step 1: Deploying Contracts`);
     console.log("-".repeat(40));
-    
+
     const contracts = await deploySwapTokens();
     const { dai, weth, swap, chainId } = contracts;
-    
+
     console.log(`   LimitOrderProtocol: ${await swap.getAddress()}`);
     console.log(`   WETH: ${await weth.getAddress()}`);
     console.log(`   DAI: ${await dai.getAddress()}`);
 
     // Deploy OCO Extension
-    const OCOOrderV1 = await ethers.getContractFactory('OCOOrderV1');
+    const OCOOrderV1 = await ethers.getContractFactory("OCOOrderV1");
     const ocoExtension = await OCOOrderV1.deploy(await swap.getAddress());
     await ocoExtension.waitForDeployment();
     console.log(`   OCOOrderV1: ${await ocoExtension.getAddress()}`);
 
     // Deploy OCO Keeper
-    const OCOKeeperV1 = await ethers.getContractFactory('OCOKeeperV1');
+    const OCOKeeperV1 = await ethers.getContractFactory("OCOKeeperV1");
     const ocoKeeper = await OCOKeeperV1.deploy(
         await swap.getAddress(),
         await ocoExtension.getAddress()
@@ -120,15 +134,15 @@ async function main() {
     // 2. Setup tokens and balances
     console.log(`\n💰 Step 2: Setting Up Balances`);
     console.log("-".repeat(40));
-    
+
     // Trader has WETH position
-    await weth.connect(trader).deposit({ value: ether('10') });
-    await weth.connect(trader).approve(await swap.getAddress(), ether('10'));
-    
+    await weth.connect(trader).deposit({ value: ether("10") });
+    await weth.connect(trader).approve(await swap.getAddress(), ether("10"));
+
     // Taker has DAI to buy WETH
-    await dai.mint(taker.address, ether('50000'));
-    await dai.connect(taker).approve(await swap.getAddress(), ether('50000'));
-    
+    await dai.mint(taker.address, ether("50000"));
+    await dai.connect(taker).approve(await swap.getAddress(), ether("50000"));
+
     console.log(`   Trader: 10 WETH`);
     console.log(`   Taker: 50,000 DAI`);
 
@@ -143,32 +157,46 @@ async function main() {
     console.log(`   Scenario: Trader holds 5 WETH`);
     console.log(`   Take Profit: Sell at $4,500/WETH`);
     console.log(`   Stop Loss: Sell at $3,500/WETH`);
-    
+
     // Create take profit order (primary)
-    const takeProfitOrder = buildOrder({
-        makerAsset: await weth.getAddress(),
-        takerAsset: await dai.getAddress(),
-        makingAmount: ether('5'), // 5 WETH
-        takingAmount: ether('22500'), // $22,500 (4500 per WETH)
-        maker: trader.address,
-    }, {
-        makingAmountData: buildOCOExtensionData(await ocoExtension.getAddress()),
-        takingAmountData: buildOCOExtensionData(await ocoExtension.getAddress()),
-        preInteraction: await ocoExtension.getAddress()
-    });
+    const takeProfitOrder = buildOrder(
+        {
+            makerAsset: await weth.getAddress(),
+            takerAsset: await dai.getAddress(),
+            makingAmount: ether("5"), // 5 WETH
+            takingAmount: ether("22500"), // $22,500 (4500 per WETH)
+            maker: trader.address,
+        },
+        {
+            makingAmountData: buildOCOExtensionData(
+                await ocoExtension.getAddress()
+            ),
+            takingAmountData: buildOCOExtensionData(
+                await ocoExtension.getAddress()
+            ),
+            preInteraction: await ocoExtension.getAddress(),
+        }
+    );
 
     // Create stop loss order (secondary)
-    const stopLossOrder = buildOrder({
-        makerAsset: await weth.getAddress(),
-        takerAsset: await dai.getAddress(),
-        makingAmount: ether('5'), // 5 WETH
-        takingAmount: ether('17500'), // $17,500 (3500 per WETH)
-        maker: trader.address,
-    }, {
-        makingAmountData: buildOCOExtensionData(await ocoExtension.getAddress()),
-        takingAmountData: buildOCOExtensionData(await ocoExtension.getAddress()),
-        preInteraction: await ocoExtension.getAddress()
-    });
+    const stopLossOrder = buildOrder(
+        {
+            makerAsset: await weth.getAddress(),
+            takerAsset: await dai.getAddress(),
+            makingAmount: ether("5"), // 5 WETH
+            takingAmount: ether("17500"), // $17,500 (3500 per WETH)
+            maker: trader.address,
+        },
+        {
+            makingAmountData: buildOCOExtensionData(
+                await ocoExtension.getAddress()
+            ),
+            takingAmountData: buildOCOExtensionData(
+                await ocoExtension.getAddress()
+            ),
+            preInteraction: await ocoExtension.getAddress(),
+        }
+    );
 
     const takeProfitHash = await swap.hashOrder(takeProfitOrder);
     const stopLossHash = await swap.hashOrder(stopLossOrder);
@@ -181,7 +209,7 @@ async function main() {
     // 4. Configure OCO Relationship
     console.log(`\n⚙️  Step 4: Configuring OCO Relationship`);
     console.log("-".repeat(40));
-    
+
     const ocoConfig = {
         primaryOrderHash: takeProfitHash,
         secondaryOrderHash: stopLossHash,
@@ -192,8 +220,8 @@ async function main() {
         isActive: true,
         configuredAt: 0,
         authorizedKeeper: ethers.ZeroAddress, // Any authorized keeper
-        maxGasPrice: ethers.parseUnits('400', 'gwei'),
-        expiresAt: Math.floor(Date.now() / 1000) + 86400 // 24 hours
+        maxGasPrice: ethers.parseUnits("400", "gwei"),
+        expiresAt: Math.floor(Date.now() / 1000) + 86400, // 24 hours
     };
 
     await ocoExtension.connect(trader).configureOCO(ocoId, ocoConfig);
@@ -202,9 +230,19 @@ async function main() {
     // 5. Sign Orders
     console.log(`\n✍️  Step 5: Signing Orders with EIP-712`);
     console.log("-".repeat(40));
-    
-    const takeProfitSignature = await signOrder(takeProfitOrder, chainId, await swap.getAddress(), trader);
-    const stopLossSignature = await signOrder(stopLossOrder, chainId, await swap.getAddress(), trader);
+
+    const takeProfitSignature = await signOrder(
+        takeProfitOrder,
+        chainId,
+        await swap.getAddress(),
+        trader
+    );
+    const stopLossSignature = await signOrder(
+        stopLossOrder,
+        chainId,
+        await swap.getAddress(),
+        trader
+    );
     console.log(`   ✅ Both orders signed by trader`);
 
     // Display initial status
@@ -223,7 +261,14 @@ async function main() {
     const takerDAIBefore = await dai.balanceOf(taker.address);
 
     // Execute take profit order
-    await executeOrder(swap, takeProfitOrder, takeProfitSignature, ether('5'), taker, "Take Profit Order");
+    await executeOrder(
+        swap,
+        takeProfitOrder,
+        takeProfitSignature,
+        ether("5"),
+        taker,
+        "Take Profit Order"
+    );
 
     // Check balances after
     const traderWETHAfter = await weth.balanceOf(trader.address);
@@ -233,11 +278,27 @@ async function main() {
 
     console.log(`\n💰 Balance Changes:`);
     console.log(`   Trader:`);
-    console.log(`     - WETH: ${ethers.formatEther(traderWETHBefore)} → ${ethers.formatEther(traderWETHAfter)} (-5 WETH)`);
-    console.log(`     - DAI: ${ethers.formatEther(traderDAIBefore)} → ${ethers.formatEther(traderDAIAfter)} (+22,500 DAI)`);
+    console.log(
+        `     - WETH: ${ethers.formatEther(
+            traderWETHBefore
+        )} → ${ethers.formatEther(traderWETHAfter)} (-5 WETH)`
+    );
+    console.log(
+        `     - DAI: ${ethers.formatEther(
+            traderDAIBefore
+        )} → ${ethers.formatEther(traderDAIAfter)} (+22,500 DAI)`
+    );
     console.log(`   Taker:`);
-    console.log(`     - WETH: ${ethers.formatEther(takerWETHBefore)} → ${ethers.formatEther(takerWETHAfter)} (+5 WETH)`);
-    console.log(`     - DAI: ${ethers.formatEther(takerDAIBefore)} → ${ethers.formatEther(takerDAIAfter)} (-22,500 DAI)`);
+    console.log(
+        `     - WETH: ${ethers.formatEther(
+            takerWETHBefore
+        )} → ${ethers.formatEther(takerWETHAfter)} (+5 WETH)`
+    );
+    console.log(
+        `     - DAI: ${ethers.formatEther(
+            takerDAIBefore
+        )} → ${ethers.formatEther(takerDAIAfter)} (-22,500 DAI)`
+    );
 
     // Display status after execution
     await displayOCOStatus(ocoExtension, ocoId, takeProfitHash, stopLossHash);
@@ -245,11 +306,17 @@ async function main() {
     // 7. Process Automatic Cancellation
     console.log(`\n🚫 Step 7: Automatic Cancellation of Stop Loss`);
     console.log("-".repeat(40));
-    
+
     // Check cancellation request
-    const cancellationRequest = await ocoExtension.cancellationRequests(stopLossHash);
-    const requestTime = new Date(Number(cancellationRequest.requestedAt) * 1000);
-    console.log(`   Cancellation requested at: ${requestTime.toLocaleTimeString()}`);
+    const cancellationRequest = await ocoExtension.cancellationRequests(
+        stopLossHash
+    );
+    const requestTime = new Date(
+        Number(cancellationRequest.requestedAt) * 1000
+    );
+    console.log(
+        `   Cancellation requested at: ${requestTime.toLocaleTimeString()}`
+    );
     console.log(`   Requested by: ${cancellationRequest.requester}`);
 
     // Wait for cancellation delay
@@ -259,26 +326,40 @@ async function main() {
 
     // Process cancellation via keeper
     console.log(`\n🤖 Keeper processing cancellation...`);
-    const cancelTx = await ocoExtension.connect(keeper).processCancellation(stopLossHash, stopLossOrder.makerTraits);
+    const cancelTx = await ocoExtension
+        .connect(keeper)
+        .processCancellation(stopLossHash, stopLossOrder.makerTraits);
     const cancelReceipt = await cancelTx.wait();
-    console.log(`   ✅ Stop loss cancelled | Gas used: ${cancelReceipt.gasUsed.toLocaleString()}`);
+    console.log(
+        `   ✅ Stop loss cancelled | Gas used: ${cancelReceipt.gasUsed.toLocaleString()}`
+    );
 
     // Verify cancellation
-    const isOrderCancelled = await swap.bitInvalidatorForOrder(trader.address, stopLossOrder.salt >> 8n);
+    const isOrderCancelled = await swap.bitInvalidatorForOrder(
+        trader.address,
+        stopLossOrder.salt >> 8n
+    );
     const bitPosition = stopLossOrder.salt & 0xffn;
     const isCancelled = (isOrderCancelled & (1n << bitPosition)) !== 0n;
-    console.log(`   Order cancellation verified: ${isCancelled ? '✅' : '❌'}`);
+    console.log(`   Order cancellation verified: ${isCancelled ? "✅" : "❌"}`);
 
     // 8. Final Status
     console.log(`\n🎉 Step 8: Lifecycle Complete!`);
     console.log("-".repeat(40));
-    
+
     await displayOCOStatus(ocoExtension, ocoId, takeProfitHash, stopLossHash);
 
     // Attempt to execute cancelled order (should fail)
     console.log(`\n🚫 Verifying Stop Loss Cannot Execute...`);
     try {
-        await executeOrder(swap, stopLossOrder, stopLossSignature, ether('5'), taker, "Cancelled Stop Loss");
+        await executeOrder(
+            swap,
+            stopLossOrder,
+            stopLossSignature,
+            ether("5"),
+            taker,
+            "Cancelled Stop Loss"
+        );
         console.log(`   ❌ ERROR: Cancelled order should not execute!`);
     } catch (error) {
         console.log(`   ✅ Confirmed: Cancelled order cannot execute`);
@@ -292,7 +373,7 @@ async function main() {
     console.log(`   • Stop loss automatically cancelled`);
     console.log(`   • Keeper processed cancellation after delay`);
     console.log(`   • Trader successfully took profit at target`);
-    
+
     console.log(`\n🏁 OCO order lifecycle completed successfully!`);
     console.log(`   This demonstrates how traders can set both`);
     console.log(`   upside and downside targets simultaneously.`);

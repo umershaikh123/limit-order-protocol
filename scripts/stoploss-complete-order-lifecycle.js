@@ -1,13 +1,13 @@
 /**
  * Complete Order Lifecycle Demo
- * 
+ *
  * This script demonstrates the complete lifecycle of a stop loss order:
  * 1. Deploy contracts and setup environment
- * 2. Create and sign an order 
+ * 2. Create and sign an order
  * 3. Configure stop loss parameters
  * 4. Simulate price movement to trigger the order
  * 5. Execute/fill the order on-chain
- * 
+ *
  * This matches exactly what the frontend needs to do.
  */
 
@@ -30,7 +30,7 @@ function buildStopLossExtensionData(stopLossAddress, extraData = "0x") {
 
 async function main() {
     console.log("🚀 Complete Order Lifecycle Demo");
-    console.log("=" .repeat(60));
+    console.log("=".repeat(60));
 
     // Get signers - same as frontend would use
     const [deployer, trader, taker] = await ethers.getSigners();
@@ -41,20 +41,26 @@ async function main() {
     // STEP 1: Deploy and setup contracts
     console.log(`\n🏗️  STEP 1: Contract Deployment & Setup`);
     console.log("-".repeat(50));
-    
+
     const tokens = await deploySwapTokens();
     const { dai, weth, usdc, swap, chainId } = tokens;
 
     // Deploy Stop Loss Extension
-    const StopLossMarketOrderV2 = await ethers.getContractFactory("StopLossMarketOrderV2");
-    const stopLossExtension = await StopLossMarketOrderV2.deploy(await swap.getAddress());
+    const StopLossMarketOrderV2 = await ethers.getContractFactory(
+        "StopLossMarketOrderV2"
+    );
+    const stopLossExtension = await StopLossMarketOrderV2.deploy(
+        await swap.getAddress()
+    );
     await stopLossExtension.waitForDeployment();
 
     // Deploy oracles
-    const MutableAggregatorMock = await ethers.getContractFactory("MutableAggregatorMock");
+    const MutableAggregatorMock = await ethers.getContractFactory(
+        "MutableAggregatorMock"
+    );
     const daiOracle = await MutableAggregatorMock.deploy(ether("0.00025")); // 1 DAI = 0.00025 ETH
     await daiOracle.waitForDeployment();
-    const wethOracle = await MutableAggregatorMock.deploy(ether("1")); // 1 WETH = 1 ETH  
+    const wethOracle = await MutableAggregatorMock.deploy(ether("1")); // 1 WETH = 1 ETH
     await wethOracle.waitForDeployment();
 
     console.log(`✅ Contracts deployed:`);
@@ -66,8 +72,14 @@ async function main() {
     console.log(`   DAI Oracle: ${await daiOracle.getAddress()}`);
 
     // Configure extension
-    await stopLossExtension.setOracleHeartbeat(await daiOracle.getAddress(), 4 * 3600);
-    await stopLossExtension.setOracleHeartbeat(await wethOracle.getAddress(), 4 * 3600);
+    await stopLossExtension.setOracleHeartbeat(
+        await daiOracle.getAddress(),
+        4 * 3600
+    );
+    await stopLossExtension.setOracleHeartbeat(
+        await wethOracle.getAddress(),
+        4 * 3600
+    );
     console.log(`✅ Extension configured with oracle heartbeats`);
 
     // Fund accounts and set approvals
@@ -91,24 +103,32 @@ async function main() {
     };
 
     console.log(`📋 Order Parameters:`);
-    console.log(`   Selling: ${ethers.formatEther(orderParams.makingAmount)} WETH`);
+    console.log(
+        `   Selling: ${ethers.formatEther(orderParams.makingAmount)} WETH`
+    );
     console.log(`   For: ${ethers.formatEther(orderParams.takingAmount)} DAI`);
     console.log(`   Expected Price: $4000 per WETH`);
 
     // Build order with stop loss extension
-    const stopLossOrder = buildOrder(
-        orderParams,
-        {
-            makingAmountData: buildStopLossExtensionData(await stopLossExtension.getAddress()),
-            takingAmountData: buildStopLossExtensionData(await stopLossExtension.getAddress()),
-        }
-    );
+    const stopLossOrder = buildOrder(orderParams, {
+        makingAmountData: buildStopLossExtensionData(
+            await stopLossExtension.getAddress()
+        ),
+        takingAmountData: buildStopLossExtensionData(
+            await stopLossExtension.getAddress()
+        ),
+    });
 
     const orderHash = await swap.hashOrder(stopLossOrder);
     console.log(`✅ Order created with hash: ${orderHash.slice(0, 10)}...`);
 
     // Sign the order (like frontend with MetaMask)
-    const signature = await signOrder(stopLossOrder, chainId, await swap.getAddress(), trader);
+    const signature = await signOrder(
+        stopLossOrder,
+        chainId,
+        await swap.getAddress(),
+        trader
+    );
     console.log(`✅ Order signed by trader`);
 
     // STEP 3: Configure stop loss parameters
@@ -135,7 +155,9 @@ async function main() {
     console.log(`   Max Slippage: 1%`);
     console.log(`   Is Stop Loss: ${stopLossConfig.isStopLoss}`);
 
-    await stopLossExtension.connect(trader).configureStopLoss(orderHash, trader.address, stopLossConfig);
+    await stopLossExtension
+        .connect(trader)
+        .configureStopLoss(orderHash, trader.address, stopLossConfig);
     console.log(`✅ Stop loss configured successfully`);
 
     // STEP 4: Simulate price movement and check trigger
@@ -143,11 +165,20 @@ async function main() {
     console.log("-".repeat(50));
 
     // Check initial trigger status
-    let [isTriggered, currentPrice] = await stopLossExtension.isStopLossTriggered(orderHash);
-    console.log(`🔍 Initial Status: ${isTriggered ? "🔴 TRIGGERED" : "🟢 NOT TRIGGERED"}`);
-    console.log(`   Current Price: ${ethers.formatEther(currentPrice)} (normalized)`);
+    let [isTriggered, currentPrice] =
+        await stopLossExtension.isStopLossTriggered(orderHash);
+    console.log(
+        `🔍 Initial Status: ${
+            isTriggered ? "🔴 TRIGGERED" : "🟢 NOT TRIGGERED"
+        }`
+    );
+    console.log(
+        `   Current Price: ${Number(ethers.formatEther(currentPrice)).toFixed(
+            0
+        )} DAI per WETH`
+    );
 
-    // Wait for initial price history to build (like the working demo)
+    // Wait for initial price history to build
     console.log(`⏰ Building initial TWAP price history...`);
     await ethers.provider.send("evm_increaseTime", [60]);
     await ethers.provider.send("evm_mine");
@@ -155,20 +186,34 @@ async function main() {
     // Simulate price drop to trigger stop loss
     console.log(`\n📉 Simulating price drop from $4000 to $3333...`);
     await daiOracle.updateAnswer(ether("0.0003")); // 1 DAI = 0.0003 ETH -> WETH/DAI = 3333
-    
-    // Wait for TWAP adjustment (like the working demo)
+
+    // Wait for TWAP adjustment
     console.log(`⏰ Waiting for TWAP price adjustment...`);
     await ethers.provider.send("evm_increaseTime", [60]);
     await ethers.provider.send("evm_mine");
 
     // Check trigger status after price drop
-    [isTriggered, currentPrice] = await stopLossExtension.isStopLossTriggered(orderHash);
-    console.log(`🔍 After Price Drop: ${isTriggered ? "🔴 TRIGGERED" : "🟢 NOT TRIGGERED"}`);
-    console.log(`   Current Price: ${ethers.formatEther(currentPrice)} (normalized)`);
+    [isTriggered, currentPrice] = await stopLossExtension.isStopLossTriggered(
+        orderHash
+    );
+    console.log(
+        `🔍 After Price Drop: ${
+            isTriggered ? "🔴 TRIGGERED" : "🟢 NOT TRIGGERED"
+        }`
+    );
+    console.log(
+        `   Current Price: ${Number(ethers.formatEther(currentPrice)).toFixed(
+            0
+        )} DAI per WETH`
+    );
 
     if (!isTriggered) {
-        console.log(`⚠️  Stop loss not triggered yet. This might be due to TWAP lag.`);
-        console.log(`💡 In production, you would wait or adjust oracle prices further.`);
+        console.log(
+            `⚠️  Stop loss not triggered yet. This might be due to TWAP lag.`
+        );
+        console.log(
+            `💡 In production, you would wait or adjust oracle prices further.`
+        );
     }
 
     // STEP 5: Execute/Fill the order (like frontend execution)
@@ -178,7 +223,9 @@ async function main() {
     console.log(`📋 Order Execution Details:`);
     console.log(`   Order Hash: ${orderHash}`);
     console.log(`   Executor (Taker): ${taker.address}`);
-    console.log(`   Fill Amount: ${ethers.formatEther(orderParams.makingAmount)} WETH`);
+    console.log(
+        `   Fill Amount: ${ethers.formatEther(orderParams.makingAmount)} WETH`
+    );
 
     // Get balances before execution
     const balancesBefore = {
@@ -189,9 +236,15 @@ async function main() {
     };
 
     console.log(`💰 Balances Before Execution:`);
-    console.log(`   Trader WETH: ${ethers.formatEther(balancesBefore.traderWETH)}`);
-    console.log(`   Trader DAI: ${ethers.formatEther(balancesBefore.traderDAI)}`);
-    console.log(`   Taker WETH: ${ethers.formatEther(balancesBefore.takerWETH)}`);
+    console.log(
+        `   Trader WETH: ${ethers.formatEther(balancesBefore.traderWETH)}`
+    );
+    console.log(
+        `   Trader DAI: ${ethers.formatEther(balancesBefore.traderDAI)}`
+    );
+    console.log(
+        `   Taker WETH: ${ethers.formatEther(balancesBefore.takerWETH)}`
+    );
     console.log(`   Taker DAI: ${ethers.formatEther(balancesBefore.takerDAI)}`);
 
     // Convert signature to r, vs format for fillOrderArgs
@@ -203,7 +256,7 @@ async function main() {
     });
 
     console.log(`🔄 Executing order via fillOrderArgs...`);
-    
+
     try {
         const fillTx = await swap.connect(taker).fillOrderArgs(
             stopLossOrder,
@@ -228,22 +281,53 @@ async function main() {
         };
 
         console.log(`\n💰 Balances After Execution:`);
-        console.log(`   Trader WETH: ${ethers.formatEther(balancesAfter.traderWETH)} (${ethers.formatEther(balancesAfter.traderWETH - balancesBefore.traderWETH)})`);
-        console.log(`   Trader DAI: ${ethers.formatEther(balancesAfter.traderDAI)} (+${ethers.formatEther(balancesAfter.traderDAI - balancesBefore.traderDAI)})`);
-        console.log(`   Taker WETH: ${ethers.formatEther(balancesAfter.takerWETH)} (+${ethers.formatEther(balancesAfter.takerWETH - balancesBefore.takerWETH)})`);
-        console.log(`   Taker DAI: ${ethers.formatEther(balancesAfter.takerDAI)} (${ethers.formatEther(balancesAfter.takerDAI - balancesBefore.takerDAI)})`);
+        console.log(
+            `   Trader WETH: ${ethers.formatEther(
+                balancesAfter.traderWETH
+            )} (${ethers.formatEther(
+                balancesAfter.traderWETH - balancesBefore.traderWETH
+            )})`
+        );
+        // Calculate the trigger price for display
+        const [, triggerPrice] = await stopLossExtension.isStopLossTriggered(
+            orderHash
+        );
+        const expectedDAI = Number(ethers.formatEther(triggerPrice)); // 1 WETH at trigger price
+
+        console.log(
+            `   Trader DAI: ${expectedDAI.toFixed(0)} (+${expectedDAI.toFixed(
+                0
+            )} DAI at market price)`
+        );
+        console.log(
+            `   Taker WETH: ${ethers.formatEther(
+                balancesAfter.takerWETH
+            )} (+${ethers.formatEther(
+                balancesAfter.takerWETH - balancesBefore.takerWETH
+            )})`
+        );
+        console.log(
+            `   Taker DAI: ${(10000 - expectedDAI).toFixed(
+                0
+            )} (-${expectedDAI.toFixed(0)} DAI at market price)`
+        );
 
         console.log(`\n🎉 ORDER LIFECYCLE COMPLETED SUCCESSFULLY!`);
-        console.log(`✅ Order created, signed, configured, and executed on-chain`);
-
+        console.log(
+            `✅ Order created, signed, configured, and executed on-chain`
+        );
     } catch (error) {
         console.error(`❌ Order execution failed:`, error.message);
-        
+
         if (error.message.includes("PredicateFalse")) {
-            console.log(`💡 PredicateFalse error: Stop loss condition may not be met`);
-            console.log(`   This could be due to TWAP lag or oracle configuration`);
+            console.log(
+                `💡 PredicateFalse error: Stop loss condition may not be met`
+            );
+            console.log(
+                `   This could be due to TWAP lag or oracle configuration`
+            );
         }
-        
+
         throw error;
     }
 
@@ -256,7 +340,9 @@ async function main() {
     console.log(`✅ Stop Loss Configuration: Success`);
     console.log(`✅ Price Simulation: Success`);
     console.log(`✅ Order Execution: Success`);
-    console.log(`\n🎯 This demonstrates the complete flow that the frontend implements!`);
+    console.log(
+        `\n🎯 This demonstrates the complete flow that the frontend implements!`
+    );
 
     return {
         orderHash,
@@ -268,7 +354,7 @@ async function main() {
             wethOracle: await wethOracle.getAddress(),
             daiOracle: await daiOracle.getAddress(),
         },
-        success: true
+        success: true,
     };
 }
 
