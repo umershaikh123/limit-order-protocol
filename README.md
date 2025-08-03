@@ -23,7 +23,7 @@ Our implementation leverages the 1inch protocol's extension system through:
 
 ## 📦 Core Extensions Built
 
-### 1. 🛡️ Stop Loss Market Order V2 (`contracts/extensions/StopLossMarketOrderV2.sol`)
+### 1. 🛡️ Stop Loss Market Order V2 ([`contracts/extensions/StopLossMarketOrderV2.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/StopLossMarketOrderV2.sol))
 
 **Purpose**: Automated stop loss and take profit orders with market execution
 
@@ -38,7 +38,7 @@ Our implementation leverages the 1inch protocol's extension system through:
 
 **Demo**: Complete lifecycle with oracle price updates and automated execution
 
-### 2. 🧊 Iceberg Order V1 (`contracts/extensions/IcebergOrderV1.sol`)
+### 2. 🧊 Iceberg Order V1 ([`contracts/extensions/IcebergOrderV1.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/IcebergOrderV1.sol))
 
 **Purpose**: Progressive order revelation for large institutional trades
 
@@ -56,7 +56,7 @@ Our implementation leverages the 1inch protocol's extension system through:
 
 **Demo**: All 4 strategies with keeper automation and security testing
 
-### 3. ⚖️ OCO Order V1 (`contracts/extensions/OCOOrderV1.sol`)
+### 3. ⚖️ OCO Order V1 ([`contracts/extensions/OCOOrderV1.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/OCOOrderV1.sol))
 
 **Purpose**: Advanced trading strategies with automatic order cancellation
 
@@ -77,21 +77,21 @@ Our implementation leverages the 1inch protocol's extension system through:
 
 ## 🤖 Keeper Infrastructure
 
-### OCO Keeper V1 (`contracts/helpers/OCOKeeperV1.sol`)
+### OCO Keeper V1 ([`contracts/helpers/OCOKeeperV1.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/OCOKeeperV1.sol))
 
 -   Chainlink Automation compatible
 -   Order monitoring and execution detection
 -   Automatic cancellation triggers
 -   Gas-optimized batch operations
 
-### Stop Loss Keeper V2 (`contracts/helpers/StopLossKeeperV2.sol`)
+### Stop Loss Keeper V2 ([`contracts/helpers/StopLossKeeperV2.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/StopLossKeeperV2.sol))
 
 -   Oracle price monitoring
 -   Trigger condition validation
 -   Automated order execution
 -   Emergency controls
 
-### Mock Iceberg Keeper (`contracts/helpers/MockIcebergKeeper.sol`)
+### Mock Iceberg Keeper ([`contracts/helpers/MockIcebergKeeper.sol`](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/MockIcebergKeeper.sol))
 
 -   Chunk revelation automation
 -   Strategy-based timing logic
@@ -102,7 +102,7 @@ Our implementation leverages the 1inch protocol's extension system through:
 
 ### Complete Lifecycle Scripts
 
-1. **Stop Loss Complete Lifecycle** (`scripts/stoploss-complete-order-lifecycle.js`)
+1. **Stop Loss Complete Lifecycle** ([`scripts/stoploss-complete-order-lifecycle.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/scripts/stoploss-complete-order-lifecycle.js))
 
     - Oracle configuration and price updates
     - Stop loss and take profit order creation
@@ -110,7 +110,7 @@ Our implementation leverages the 1inch protocol's extension system through:
     - Automated execution with balance verification
     - Full transaction tracking with gas metrics
 
-2. **Iceberg Complete Lifecycle** (`scripts/iceberg-complete-order-lifecycle.js`)
+2. **Iceberg Complete Lifecycle** ([`scripts/iceberg-complete-order-lifecycle.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/scripts/iceberg-complete-order-lifecycle.js))
 
     - All 4 reveal strategies demonstration
     - Progressive chunk revelation
@@ -118,7 +118,7 @@ Our implementation leverages the 1inch protocol's extension system through:
     - Security feature testing
     - Complete transaction summary
 
-3. **OCO Complete Lifecycle** (`scripts/oco-complete-order-lifecycle.js`)
+3. **OCO Complete Lifecycle** ([`scripts/oco-complete-order-lifecycle.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/scripts/oco-complete-order-lifecycle.js))
     - Bracket trading (Take Profit + Stop Loss)
     - Breakout trading (Momentum strategies)
     - Range trading (Support/Resistance)
@@ -127,7 +127,7 @@ Our implementation leverages the 1inch protocol's extension system through:
 
 ### Deployment & Infrastructure
 
-4. **Extension Deployment** (`scripts/deploy-extensions.js`)
+4. **Extension Deployment** ([`scripts/deploy-extensions.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/scripts/deploy-extensions.js))
     - Complete contract deployment pipeline
     - Oracle and keeper configuration
     - Authorization and access control setup
@@ -148,6 +148,15 @@ contracts/
     ├── OCOKeeperV1.sol              # OCO order automation
     └── MockIcebergKeeper.sol        # Iceberg chunk automation
 ```
+
+**View the contracts:**
+
+-   [StopLossMarketOrderV2.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/StopLossMarketOrderV2.sol)
+-   [IcebergOrderV1.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/IcebergOrderV1.sol)
+-   [OCOOrderV1.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/OCOOrderV1.sol)
+-   [StopLossKeeperV2.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/StopLossKeeperV2.sol)
+-   [OCOKeeperV1.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/OCOKeeperV1.sol)
+-   [MockIcebergKeeper.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/MockIcebergKeeper.sol)
 
 ### Gas Optimization
 
@@ -195,7 +204,7 @@ Execution: Take profit hit, stop loss auto-cancelled
 Result: +22,500 DAI | Gas: 120k ✅
 ```
 
-## 🎨 UI Implementation (Stretch Goal Achieved)
+## 🎨 UI Implementation (Static , no contract integration)
 
 ### SuperOrder Frontend Demo
 
@@ -216,44 +225,13 @@ Result: +22,500 DAI | Gas: 120k ✅
 
 **Note**: The frontend is a comprehensive static UI demonstration showing all three order interfaces. While Web3 libraries are configured, the contract interactions are demonstrated through the complete lifecycle scripts rather than the frontend. This approach allowed us to focus on perfecting the smart contract functionality and comprehensive testing.
 
-### Security Features
-
--   ✅ **Access Control**: Role-based permissions
--   ✅ **Reentrancy Protection**: Comprehensive guards
--   ✅ **Oracle Security**: Staleness and manipulation protection
--   ✅ **Emergency Controls**: Pause/unpause functionality
--   ✅ **Input Validation**: Comprehensive parameter checking
--   ✅ **Event Logging**: Complete audit trail
-
-### Testing Coverage
-
--   ✅ **Unit Tests**: Individual contract functionality
--   ✅ **Integration Tests**: Cross-contract interactions
--   ✅ **Gas Benchmarks**: Performance optimization
--   ✅ **Demo Scripts**: Real-world usage scenarios
--   ✅ **Security Tests**: Access control and edge cases
-
 #### Test Files Created
 
 **Extension Tests**:
 
--   `test/StopLossMarketOrderV2.js` - Comprehensive stop loss testing
--   `test/IcebergOrderV1.js` - All iceberg strategies and security
--   `test/OCOOrderV1.js` - OCO strategies and cancellation logic
-
-### Multi-Chain Compatibility
-
--   ✅ **Ethereum Mainnet** ready
--   ✅ **Layer 2 Networks** (Polygon, Arbitrum, Optimism)
--   ✅ **BSC, Avalanche, Fantom** support
--   ✅ **Gas Optimization** for all networks
-
-### Innovation Highlights
-
--   🏆 **First** comprehensive iceberg order implementation on 1inch
--   🏆 **Advanced** OCO strategies with automated cancellation
--   🏆 **Institutional-grade** stop loss with oracle integration
--   🏆 **Complete** keeper infrastructure for automation
+-   [`test/StopLossMarketOrderV2.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/test/StopLossMarketOrderV2.js) - Comprehensive stop loss testing
+-   [`test/IcebergOrderV1.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/test/IcebergOrderV1.js) - All iceberg strategies and security
+-   [`test/OCOOrderV1.js`](https://github.com/umershaikh123/limit-order-protocol/blob/master/test/OCOOrderV1.js) - OCO strategies and cancellation logic
 
 ## 🛠️ Getting Started
 
@@ -272,14 +250,40 @@ cd limit-order-protocol
 yarn install
 ```
 
+### Environment Setup
+
+1. Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+2. Configure your `.env` file with the following variables:
+
+```bash
+# Required: RPC URL for mainnet forking (e.g., Alchemy, Infura)
+MAINNET_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/YOUR_API_KEY
+
+# Required for deployment: Private key (without 0x prefix)
+PRIVATE_KEY=your_private_key_here
+
+# Optional: Etherscan API key for contract verification
+ETHERSCAN_API_KEY=your_etherscan_api_key
+
+# Optional: Enable debug logging
+DEBUG=false
+```
+
+3. Get your API keys:
+    - **Alchemy/Infura**: Sign up at alchemy.com
+    - **Etherscan**: Get your API key from https://etherscan.io
+    - **Private Key**: Use a test wallet private key
+
 ### Demo Execution
 
 ```bash
 # Start local network
 npx hardhat node
-
-# Deploy all extensions
-npx hardhat run scripts/deploy-extensions.js --network localhost
 
 # Run complete lifecycle demos
 npx hardhat run scripts/stoploss-complete-order-lifecycle.js
@@ -287,7 +291,7 @@ npx hardhat run scripts/iceberg-complete-order-lifecycle.js
 npx hardhat run scripts/oco-complete-order-lifecycle.js
 
 # Start frontend (optional)
-cd super-order && npm run dev
+cd super-order && npm install && npm run dev
 ```
 
 ### Network Configuration
