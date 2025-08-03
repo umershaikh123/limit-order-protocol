@@ -156,7 +156,7 @@ contracts/
 -   [OCOOrderV1.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/extensions/OCOOrderV1.sol)
 -   [StopLossKeeperV2.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/StopLossKeeperV2.sol)
 -   [OCOKeeperV1.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/OCOKeeperV1.sol)
--   [MockIcebergKeeper.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/helpers/MockIcebergKeeper.sol)
+-   [MockIcebergKeeper.sol](https://github.com/umershaikh123/limit-order-protocol/blob/master/contracts/mocks/MockIcebergKeeper.sol)
 
 ### Gas Optimization
 
